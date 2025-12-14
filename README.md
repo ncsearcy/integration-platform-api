@@ -168,5 +168,7 @@ Authentication / authorization for client access
 ===
 
 Built by Nicholas Searcy
+
 Integration / Platform Engineer
+
 Focused on API reliability, automation, and operational clarity.
