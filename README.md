@@ -3,9 +3,9 @@
 
 Overview
 
-Integration Platform API is a backend service designed to manage client integrations with external APIs in a reliable, observable, and scalable way.
+Integration Platform API is a backend service designed to manage client integrations with external APIs in a reliable, observable, and production-oriented way.
 
-The service focuses on common integration challenges:
+The service addresses common integration challenges such as:
 
 Client registration and configuration
 
@@ -13,42 +13,42 @@ External API synchronization
 
 Failure handling and retry safety
 
-Clear operational visibility through structured logging and health checks
+Operational visibility through structured logging and health checks
 
-This project mirrors the types of integration and platform systems commonly found in B2B SaaS environments.
+This project intentionally mirrors the types of integration and platform services commonly found in B2B SaaS environments.
 
-🎯 Goals of This Project
-===
+🎯 Project Goals
 
-The goal of this project is not novelty, but production-style engineering.
+The goal of this project is production-style engineering, not novelty.
 
 Specifically, it demonstrates:
 
-Designing and owning RESTful API services
+Ownership of RESTful API services end-to-end
 
-Defensive handling of external system failures
+Defensive handling of unreliable external systems
 
 Clear separation of concerns (API, services, data, observability)
 
 CI/CD automation and repeatable local development
 
-Writing code that is easy to debug and operate
+Code designed for debuggability and operational clarity
 
 🧱 Architecture Overview
 ===
 
-Core components:
+Core Components
 
-FastAPI for API routing and request validation
+FastAPI — API routing and request validation
 
-PostgreSQL for persistence
+PostgreSQL — persistent storage
 
-Structured JSON logging for observability
+Structured JSON logging — observability and debugging
 
-Docker & docker-compose for local development
+Docker & Docker Compose — local development consistency
 
-GitHub Actions for CI (linting, tests, build)
+GitHub Actions — CI for linting, tests, and builds
 
+High-Level Flow
 Client
   ↓
 Integration Platform API
@@ -61,37 +61,38 @@ Each integration request is validated, logged with contextual metadata, and proc
 🔌 Key Features
 ===
 
-Client Management -
+Client Management
 
 Register and retrieve integration clients
 
-Validate configuration and identifiers
+Validate client configuration and identifiers
 
-Persist client metadata for integration tracking
+Persist client metadata for tracking integration state
 
-Integration Sync -
+Integration Synchronization
 
 Trigger synchronization with an external API
 
-Normalize and store responses
+Normalize and store API responses
 
 Handle timeouts and error responses gracefully
 
-Observability - 
+Observability 
 
 Structured JSON logs with request and client context
 
-Health endpoint for service readiness
+Health endpoint for service readiness checks
 
-Clear error reporting for failed integrations
+Clear error reporting for failed integration attempts
 
-Automation & CI - 
+Automation & CI
 
 Automated linting and tests on every commit
 
-Dockerized builds for consistency across environments
+Dockerized builds for consistent environments
 
 📡 API Endpoints (Sample)
+===
 
 POST   /clients
 GET    /clients/{id}
@@ -104,14 +105,13 @@ GET    /health
 🧪 Running Locally
 ===
 
-Prerequisites - 
+Prerequisites
 
 Docker
 
 Docker Compose
 
-Start the service
-
+Start the Service
 docker-compose up --build
 
 
@@ -120,24 +120,27 @@ The API will be available at:
 http://localhost:8000
 
 
-API documentation (Swagger UI):
+Interactive API documentation (Swagger UI):
 
 http://localhost:8000/docs
-
 
 🧠 Design Considerations
 ===
 
-External APIs are assumed to be unreliable
+External APIs Are Assumed to Be Unreliable
+
 Timeouts, malformed responses, and partial failures are expected and handled explicitly.
 
-Observability over cleverness
-Logs are structured to explain what happened without needing to reproduce issues.
+Observability Over Cleverness
 
-Idempotency and safety
+Logs are structured to explain what happened without requiring issue reproduction.
+
+Idempotency and Safety
+
 Integration operations are designed to be safely retried without unintended side effects.
 
-Clarity > abstraction
+Clarity Over Abstraction
+
 Code favors readability and maintainability over premature optimization.
 
 ☁️ Deployment Notes (Azure)
@@ -149,25 +152,24 @@ Azure App Service (container-based)
 
 Azure Container Apps
 
-Secrets and configuration are expected to be managed via environment variables or Azure Key Vault in a production deployment.
+Secrets and configuration are expected to be managed via environment variables or Azure Key Vault in a production environment.
 
-(Cloud deployment is intentionally kept simple to emphasize service behavior over infrastructure complexity.)
+Cloud deployment is intentionally kept simple to emphasize service behavior and reliability over infrastructure complexity.
 
 🚧 Future Enhancements
 ===
 
-Retry policies with backoff
+Retry policies with exponential backoff
 
-Integration metrics (success/failure counts)
+Integration-level metrics (success / failure counts)
 
-Webhook-based sync triggers
+Webhook-based synchronization triggers
 
-Authentication / authorization for client access
+Authentication and authorization for client access
 
 👤 Author
 ===
-
-Built by Nicholas Searcy
+Nicholas Searcy
 
 Integration / Platform Engineer
 
