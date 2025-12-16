@@ -11,8 +11,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy requirements
 COPY requirements.txt .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir --user -r requirements.txt
+# Install Python dependencies to /opt/venv
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Final stage
 FROM python:3.11-slim
@@ -25,19 +27,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy Python dependencies from builder
-COPY --from=builder /root/.local /root/.local
+COPY --from=builder /opt/venv /opt/venv
 
 # Copy application code
 COPY app/ /app/app/
 
-# Create non-root user and give access to Python packages
+# Create non-root user
 RUN useradd -m -u 1000 appuser && \
-    chown -R appuser:appuser /app && \
-    chmod -R 755 /root/.local
+    chown -R appuser:appuser /app
 
-# Make sure scripts and packages in .local are usable
-ENV PATH=/root/.local/bin:$PATH \
-    PYTHONPATH=/root/.local/lib/python3.11/site-packages
+# Make sure virtual environment is used
+ENV PATH="/opt/venv/bin:$PATH"
 
 # Set default environment variables (can be overridden at runtime)
 ENV ENVIRONMENT=production \
