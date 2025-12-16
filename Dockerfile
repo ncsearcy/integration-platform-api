@@ -1,5 +1,5 @@
 # Multi-stage build for smaller final image
-FROM python:3.11-slim as builder
+FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
@@ -29,10 +29,14 @@ COPY --from=builder /root/.local /root/.local
 
 # Copy application code
 COPY app/ /app/app/
-COPY .env.example /app/.env
 
 # Make sure scripts in .local are usable
 ENV PATH=/root/.local/bin:$PATH
+
+# Set default environment variables (can be overridden at runtime)
+ENV ENVIRONMENT=production \
+    LOG_LEVEL=INFO \
+    DATABASE_URL=postgresql://postgres:postgres@localhost:5432/integration_platform
 
 # Create non-root user
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
