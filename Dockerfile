@@ -30,8 +30,9 @@ COPY --from=builder /root/.local /root/.local
 # Copy application code
 COPY app/ /app/app/
 
-# Make sure scripts in .local are usable
-ENV PATH=/root/.local/bin:$PATH
+# Make sure scripts and packages in .local are usable
+ENV PATH=/root/.local/bin:$PATH \
+    PYTHONPATH=/root/.local/lib/python3.11/site-packages:$PYTHONPATH
 
 # Set default environment variables (can be overridden at runtime)
 ENV ENVIRONMENT=production \
