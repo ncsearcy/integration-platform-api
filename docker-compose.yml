@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database
+  db:
+    image: postgres:15-alpine
+    container_name: integration-platform-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: integration_platform
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - integration-network
+
+  # FastAPI application
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: integration-platform-api
+    environment:
+      # Application
+      APP_NAME: "Integration Platform API"
+      APP_VERSION: "0.1.0"
+      ENVIRONMENT: "development"
+      DEBUG: "true"
+      LOG_LEVEL: "INFO"
+
+      # Server
+      HOST: "0.0.0.0"
+      PORT: "8000"
+      RELOAD: "false"
+
+      # Database
+      DATABASE_URL: "postgresql://postgres:postgres@db:5432/integration_platform"
+      DATABASE_POOL_SIZE: "5"
+      DATABASE_MAX_OVERFLOW: "10"
+
+      # Security
+      SECRET_KEY: "dev-secret-key-change-in-production-min-32-characters"
+      ENCRYPTION_KEY: "dev-encryption-key-change-in-production"
+      API_KEY_LENGTH: "32"
+
+      # External API
+      EXTERNAL_API_URL: "https://jsonplaceholder.typicode.com"
+      EXTERNAL_API_TIMEOUT: "30"
+      EXTERNAL_API_MAX_RETRIES: "3"
+
+      # CORS
+      CORS_ORIGINS: "http://localhost:3000,http://localhost:8000"
+      CORS_CREDENTIALS: "true"
+      CORS_METHODS: "*"
+      CORS_HEADERS: "*"
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - integration-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  integration-network:
+    driver: bridge

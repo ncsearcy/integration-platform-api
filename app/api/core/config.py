@@ -1,7 +1,7 @@
 from functools import lru_cache
-from typing import List
+from typing import List, Union
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -16,6 +16,8 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
+        # Don't try to parse strings as JSON for list fields
+        env_parse_enums=True,
     )
 
     # Application Settings
@@ -58,14 +60,14 @@ class Settings(BaseSettings):
     external_api_timeout: int = Field(default=30, description="External API timeout in seconds")
     external_api_max_retries: int = Field(default=3, description="Max retries for external API calls")
 
-    # CORS Settings
-    cors_origins: List[str] = Field(
-        default=["http://localhost:3000", "http://localhost:8000"],
-        description="Allowed CORS origins",
+    # CORS Settings (stored as strings, parsed to lists)
+    cors_origins: str = Field(
+        default="http://localhost:3000,http://localhost:8000",
+        description="Allowed CORS origins (comma-separated)",
     )
     cors_credentials: bool = Field(default=True, description="Allow credentials in CORS")
-    cors_methods: List[str] = Field(default=["*"], description="Allowed CORS methods")
-    cors_headers: List[str] = Field(default=["*"], description="Allowed CORS headers")
+    cors_methods: str = Field(default="*", description="Allowed CORS methods (comma-separated)")
+    cors_headers: str = Field(default="*", description="Allowed CORS headers (comma-separated)")
 
     # Rate Limiting
     rate_limit_per_minute: int = Field(default=60, description="Rate limit per minute per client")
@@ -74,29 +76,36 @@ class Settings(BaseSettings):
     enable_metrics: bool = Field(default=True, description="Enable metrics collection")
     metrics_port: int = Field(default=9090, description="Metrics server port")
 
-    @field_validator("cors_origins", mode="before")
-    @classmethod
-    def parse_cors_origins(cls, v):
-        """Parse CORS origins from comma-separated string or list."""
-        if isinstance(v, str):
-            return [origin.strip() for origin in v.split(",")]
-        return v
+    @property
+    def cors_origins_list(self) -> List[str]:
+        """Parse CORS origins as a list."""
+        if not self.cors_origins:
+            return []
+        if "," in self.cors_origins:
+            return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
+        return [self.cors_origins.strip()] if self.cors_origins.strip() else []
 
-    @field_validator("cors_methods", mode="before")
-    @classmethod
-    def parse_cors_methods(cls, v):
-        """Parse CORS methods from comma-separated string or list."""
-        if isinstance(v, str):
-            return [method.strip() for method in v.split(",")]
-        return v
+    @property
+    def cors_methods_list(self) -> List[str]:
+        """Parse CORS methods as a list."""
+        if not self.cors_methods:
+            return []
+        if self.cors_methods.strip() == "*":
+            return ["*"]
+        if "," in self.cors_methods:
+            return [method.strip() for method in self.cors_methods.split(",") if method.strip()]
+        return [self.cors_methods.strip()] if self.cors_methods.strip() else []
 
-    @field_validator("cors_headers", mode="before")
-    @classmethod
-    def parse_cors_headers(cls, v):
-        """Parse CORS headers from comma-separated string or list."""
-        if isinstance(v, str):
-            return [header.strip() for header in v.split(",")]
-        return v
+    @property
+    def cors_headers_list(self) -> List[str]:
+        """Parse CORS headers as a list."""
+        if not self.cors_headers:
+            return []
+        if self.cors_headers.strip() == "*":
+            return ["*"]
+        if "," in self.cors_headers:
+            return [header.strip() for header in self.cors_headers.split(",") if header.strip()]
+        return [self.cors_headers.strip()] if self.cors_headers.strip() else []
 
     @property
     def is_development(self) -> bool:
