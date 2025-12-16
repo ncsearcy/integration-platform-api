@@ -87,13 +87,13 @@ async def sync_integration(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e),
-        )
+        ) from e
     except Exception as e:
         logger.error("sync_integration_failed", client_id=client_id, error=str(e), exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to sync integration: {str(e)}",
-        )
+        ) from e
 
 
 @router.get(
@@ -104,7 +104,9 @@ async def sync_integration(
 )
 def list_integrations(
     client_id: int | None = Query(None, description="Filter by client ID"),
-    status_filter: IntegrationStatus | None = Query(None, alias="status", description="Filter by status"),
+    status_filter: IntegrationStatus | None = Query(
+        None, alias="status", description="Filter by status"
+    ),
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(50, ge=1, le=100, description="Items per page"),
     service: IntegrationService = Depends(get_integration_service),
@@ -162,9 +164,7 @@ def list_integrations(
                 try:
                     item.response_data = json.loads(integration.response_data)
                 except json.JSONDecodeError:
-                    logger.warning(
-                        "invalid_response_data_json", integration_id=integration.id
-                    )
+                    logger.warning("invalid_response_data_json", integration_id=integration.id)
                     item.response_data = None
 
             items.append(item)
@@ -184,7 +184,7 @@ def list_integrations(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to list integrations: {str(e)}",
-        )
+        ) from e
 
 
 @router.get(

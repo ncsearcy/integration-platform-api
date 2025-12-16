@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -19,7 +19,7 @@ class ClientBase(BaseModel):
 class ClientCreate(ClientBase):
     """Schema for creating a new client."""
 
-    credentials: Dict[str, Any] | None = Field(
+    credentials: dict[str, Any] | None = Field(
         None, description="Client credentials (will be encrypted)"
     )
 
@@ -47,7 +47,7 @@ class ClientUpdate(BaseModel):
         None, ge=1, le=300, description="API timeout in seconds"
     )
     is_active: bool | None = Field(None, description="Whether client is active")
-    credentials: Dict[str, Any] | None = Field(
+    credentials: dict[str, Any] | None = Field(
         None, description="Client credentials (will be encrypted)"
     )
 
@@ -106,7 +106,7 @@ class Client(ClientBase):
 class ClientWithCredentials(Client):
     """Schema for client with decrypted credentials (admin only)."""
 
-    credentials: Dict[str, Any] | None = Field(None, description="Decrypted credentials")
+    credentials: dict[str, Any] | None = Field(None, description="Decrypted credentials")
 
     model_config = ConfigDict(from_attributes=True)
 

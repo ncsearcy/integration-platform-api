@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, Any
+from typing import Any
 
 from fastapi import APIRouter, Depends, status
 from pydantic import BaseModel
@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.api.core.config import settings
 from app.api.core.logging import get_logger
-from app.api.db.session import get_db, check_db_connection
+from app.api.db.session import check_db_connection, get_db
 from app.api.models.client import Client
 from app.api.models.integration import Integration
 
@@ -31,7 +31,7 @@ class ReadinessResponse(BaseModel):
     status: str
     timestamp: str
     version: str
-    components: Dict[str, Any]
+    components: dict[str, Any]
 
 
 class StatusResponse(BaseModel):
@@ -42,8 +42,8 @@ class StatusResponse(BaseModel):
     version: str
     environment: str
     uptime_seconds: float
-    components: Dict[str, Any]
-    metrics: Dict[str, Any]
+    components: dict[str, Any]
+    metrics: dict[str, Any]
 
 
 # Application start time for uptime calculation
@@ -153,7 +153,7 @@ def status_check(db: Session = Depends(get_db)) -> StatusResponse:
     # Get metrics
     try:
         total_clients = db.query(Client).count()
-        active_clients = db.query(Client).filter(Client.is_active == True).count()
+        active_clients = db.query(Client).filter(Client.is_active).count()
         total_integrations = db.query(Integration).count()
 
         # Get recent integration (last hour)
@@ -176,7 +176,9 @@ def status_check(db: Session = Depends(get_db)) -> StatusResponse:
         "database": {
             "status": "healthy" if db_connected else "unhealthy",
             "connected": db_connected,
-            "url": settings.database_url.split("@")[-1] if "@" in settings.database_url else "unknown",
+            "url": (
+                settings.database_url.split("@")[-1] if "@" in settings.database_url else "unknown"
+            ),
         },
         "api": {
             "status": "healthy",

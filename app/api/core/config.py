@@ -1,7 +1,6 @@
 from functools import lru_cache
-from typing import List, Union
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -23,7 +22,9 @@ class Settings(BaseSettings):
     # Application Settings
     app_name: str = Field(default="Integration Platform API", description="Application name")
     app_version: str = Field(default="0.1.0", description="Application version")
-    environment: str = Field(default="development", description="Environment (development, staging, production)")
+    environment: str = Field(
+        default="development", description="Environment (development, staging, production)"
+    )
     debug: bool = Field(default=False, description="Debug mode")
     log_level: str = Field(default="INFO", description="Logging level")
 
@@ -58,7 +59,9 @@ class Settings(BaseSettings):
         description="Base URL for external API",
     )
     external_api_timeout: int = Field(default=30, description="External API timeout in seconds")
-    external_api_max_retries: int = Field(default=3, description="Max retries for external API calls")
+    external_api_max_retries: int = Field(
+        default=3, description="Max retries for external API calls"
+    )
 
     # CORS Settings (stored as strings, parsed to lists)
     cors_origins: str = Field(
@@ -77,7 +80,7 @@ class Settings(BaseSettings):
     metrics_port: int = Field(default=9090, description="Metrics server port")
 
     @property
-    def cors_origins_list(self) -> List[str]:
+    def cors_origins_list(self) -> list[str]:
         """Parse CORS origins as a list."""
         if not self.cors_origins:
             return []
@@ -86,7 +89,7 @@ class Settings(BaseSettings):
         return [self.cors_origins.strip()] if self.cors_origins.strip() else []
 
     @property
-    def cors_methods_list(self) -> List[str]:
+    def cors_methods_list(self) -> list[str]:
         """Parse CORS methods as a list."""
         if not self.cors_methods:
             return []
@@ -97,7 +100,7 @@ class Settings(BaseSettings):
         return [self.cors_methods.strip()] if self.cors_methods.strip() else []
 
     @property
-    def cors_headers_list(self) -> List[str]:
+    def cors_headers_list(self) -> list[str]:
         """Parse CORS headers as a list."""
         if not self.cors_headers:
             return []
@@ -128,7 +131,7 @@ class Settings(BaseSettings):
         return self.database_url.replace("postgresql://", "postgresql+asyncpg://")
 
 
-@lru_cache()
+@lru_cache
 def get_settings() -> Settings:
     """
     Get cached settings instance.

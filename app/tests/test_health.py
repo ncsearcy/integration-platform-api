@@ -2,7 +2,6 @@
 Tests for health and status endpoints.
 """
 
-import pytest
 from fastapi.testclient import TestClient
 
 

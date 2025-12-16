@@ -1,6 +1,6 @@
 import json
 import secrets
-from typing import Any, Dict
+from typing import Any
 
 from cryptography.fernet import Fernet, InvalidToken
 
@@ -43,7 +43,7 @@ class SecurityManager:
 
         except Exception as e:
             logger.error("security_manager_init_failed", error=str(e), exc_info=True)
-            raise EncryptionError(f"Failed to initialize security manager: {e}")
+            raise EncryptionError(f"Failed to initialize security manager: {e}") from e
 
     def generate_api_key(self, prefix: str = "pk") -> str:
         """
@@ -65,7 +65,7 @@ class SecurityManager:
         logger.info("api_key_generated", prefix=prefix, length=len(api_key))
         return api_key
 
-    def encrypt_credentials(self, credentials: Dict[str, Any]) -> str:
+    def encrypt_credentials(self, credentials: dict[str, Any]) -> str:
         """
         Encrypt credentials dictionary.
 
@@ -102,9 +102,9 @@ class SecurityManager:
 
         except Exception as e:
             logger.error("encryption_failed", error=str(e), exc_info=True)
-            raise EncryptionError(f"Failed to encrypt credentials: {e}")
+            raise EncryptionError(f"Failed to encrypt credentials: {e}") from e
 
-    def decrypt_credentials(self, encrypted_credentials: str) -> Dict[str, Any]:
+    def decrypt_credentials(self, encrypted_credentials: str) -> dict[str, Any]:
         """
         Decrypt credentials string.
 
@@ -141,13 +141,15 @@ class SecurityManager:
 
         except InvalidToken:
             logger.error("decryption_failed_invalid_token")
-            raise EncryptionError("Invalid encryption token - credentials may be corrupted")
+            raise EncryptionError(
+                "Invalid encryption token - credentials may be corrupted"
+            ) from None
         except json.JSONDecodeError as e:
             logger.error("decryption_failed_invalid_json", error=str(e))
-            raise EncryptionError("Decrypted data is not valid JSON")
+            raise EncryptionError("Decrypted data is not valid JSON") from e
         except Exception as e:
             logger.error("decryption_failed", error=str(e), exc_info=True)
-            raise EncryptionError(f"Failed to decrypt credentials: {e}")
+            raise EncryptionError(f"Failed to decrypt credentials: {e}") from e
 
     def rotate_encryption_key(self, old_key: bytes, new_key: bytes, encrypted_data: str) -> str:
         """
@@ -178,7 +180,7 @@ class SecurityManager:
 
         except Exception as e:
             logger.error("key_rotation_failed", error=str(e), exc_info=True)
-            raise EncryptionError(f"Failed to rotate encryption key: {e}")
+            raise EncryptionError(f"Failed to rotate encryption key: {e}") from e
 
     @staticmethod
     def generate_fernet_key() -> str:
@@ -216,12 +218,12 @@ def get_security_manager() -> SecurityManager:
 
 
 # Convenience functions
-def encrypt_credentials(credentials: Dict[str, Any]) -> str:
+def encrypt_credentials(credentials: dict[str, Any]) -> str:
     """Encrypt credentials using the global security manager."""
     return get_security_manager().encrypt_credentials(credentials)
 
 
-def decrypt_credentials(encrypted_credentials: str) -> Dict[str, Any]:
+def decrypt_credentials(encrypted_credentials: str) -> dict[str, Any]:
     """Decrypt credentials using the global security manager."""
     return get_security_manager().decrypt_credentials(encrypted_credentials)
 

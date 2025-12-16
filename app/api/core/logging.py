@@ -1,7 +1,7 @@
 import logging
 import sys
 from contextvars import ContextVar
-from typing import Any, Dict
+from typing import Any
 
 import structlog
 from structlog.types import EventDict, Processor
@@ -171,7 +171,7 @@ def log_function_call(func_name: str, **kwargs: Any) -> None:
     logger.debug("function_called", function=func_name, **kwargs)
 
 
-def log_error(error: Exception, context: Dict[str, Any] | None = None) -> None:
+def log_error(error: Exception, context: dict[str, Any] | None = None) -> None:
     """
     Helper to log errors with context.
 

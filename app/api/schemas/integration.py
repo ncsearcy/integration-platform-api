@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -36,7 +36,7 @@ class IntegrationUpdate(BaseModel):
     """Schema for updating an integration."""
 
     status: IntegrationStatus | None = Field(None, description="Integration status")
-    response_data: Dict[str, Any] | None = Field(None, description="Normalized response data")
+    response_data: dict[str, Any] | None = Field(None, description="Normalized response data")
     error_message: str | None = Field(None, description="Error message if failed")
     error_code: str | None = Field(None, description="Error code if failed")
     started_at: datetime | None = Field(None, description="When integration started")
@@ -58,7 +58,7 @@ class Integration(IntegrationBase):
 
     id: int
     client_id: int
-    response_data: Dict[str, Any] | None = Field(None, description="Normalized response data")
+    response_data: dict[str, Any] | None = Field(None, description="Normalized response data")
     error_message: str | None
     error_code: str | None
     started_at: datetime | None
@@ -134,7 +134,7 @@ class IntegrationSync(BaseModel):
 
     endpoint: str | None = Field(None, description="Optional specific endpoint to call")
     method: str = Field(default="GET", description="HTTP method")
-    params: Dict[str, Any] | None = Field(None, description="Optional query parameters")
+    params: dict[str, Any] | None = Field(None, description="Optional query parameters")
 
     model_config = ConfigDict(
         json_schema_extra={

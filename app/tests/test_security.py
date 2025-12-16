@@ -3,11 +3,12 @@ Tests for security module.
 """
 
 import pytest
+
 from app.api.core.security import (
-    SecurityManager,
     EncryptionError,
-    encrypt_credentials,
+    SecurityManager,
     decrypt_credentials,
+    encrypt_credentials,
     generate_api_key,
 )
 

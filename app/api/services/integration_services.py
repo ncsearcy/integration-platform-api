@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 from sqlalchemy.orm import Session
 
@@ -8,7 +8,7 @@ from app.api.core.logging import get_logger
 from app.api.core.security import decrypt_credentials, encrypt_credentials, generate_api_key
 from app.api.models.client import Client
 from app.api.models.integration import Integration, IntegrationStatus
-from app.api.services.external_api import ExternalAPIService, ExternalAPIError
+from app.api.services.external_api import ExternalAPIError, ExternalAPIService
 
 logger = get_logger(__name__)
 
@@ -39,7 +39,7 @@ class IntegrationService:
         external_api_url: str | None = None,
         external_api_timeout: int = 30,
         is_active: bool = True,
-        credentials: Dict[str, Any] | None = None,
+        credentials: dict[str, Any] | None = None,
     ) -> Client:
         """
         Create a new client.
@@ -108,7 +108,9 @@ class IntegrationService:
         """
         return self.db.query(Client).filter(Client.api_key == api_key).first()
 
-    def get_clients(self, skip: int = 0, limit: int = 100, is_active: bool | None = None) -> list[Client]:
+    def get_clients(
+        self, skip: int = 0, limit: int = 100, is_active: bool | None = None
+    ) -> list[Client]:
         """
         Get list of clients with pagination.
 
@@ -135,7 +137,7 @@ class IntegrationService:
         external_api_url: str | None = None,
         external_api_timeout: int | None = None,
         is_active: bool | None = None,
-        credentials: Dict[str, Any] | None = None,
+        credentials: dict[str, Any] | None = None,
     ) -> Client | None:
         """
         Update an existing client.
@@ -201,7 +203,7 @@ class IntegrationService:
         self.logger.info("client_deleted", client_id=client_id)
         return True
 
-    def get_client_credentials(self, client_id: int) -> Dict[str, Any] | None:
+    def get_client_credentials(self, client_id: int) -> dict[str, Any] | None:
         """
         Get decrypted client credentials.
 
@@ -228,7 +230,7 @@ class IntegrationService:
         client_id: int,
         endpoint: str = "/posts",
         method: str = "GET",
-        params: Dict[str, Any] | None = None,
+        params: dict[str, Any] | None = None,
     ) -> Integration:
         """
         Sync data from external API for a client.

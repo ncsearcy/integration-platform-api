@@ -6,9 +6,9 @@ from app.api.db.session import get_db
 from app.api.schemas.client import (
     Client,
     ClientCreate,
+    ClientList,
     ClientUpdate,
     ClientWithCredentials,
-    ClientList,
 )
 from app.api.services.integration_services import IntegrationService
 
@@ -67,7 +67,7 @@ def create_client(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to create client: {str(e)}",
-        )
+        ) from e
 
 
 @router.get(
@@ -131,7 +131,7 @@ def list_clients(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to list clients: {str(e)}",
-        )
+        ) from e
 
 
 @router.get(

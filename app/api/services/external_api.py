@@ -1,5 +1,5 @@
-from typing import Any, Dict
 from datetime import datetime
+from typing import Any
 
 import httpx
 
@@ -46,10 +46,10 @@ class ExternalAPIService:
         self,
         endpoint: str,
         method: str = "GET",
-        params: Dict[str, Any] | None = None,
-        headers: Dict[str, str] | None = None,
-        credentials: Dict[str, Any] | None = None,
-    ) -> Dict[str, Any]:
+        params: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
+        credentials: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """
         Call external API endpoint.
 
@@ -127,7 +127,7 @@ class ExternalAPIService:
                 if attempt >= self.max_retries:
                     raise ExternalAPIError(
                         f"API call failed with status {e.response.status_code}: {e.response.text}"
-                    )
+                    ) from e
 
             except httpx.TimeoutException:
                 logger.warning(
@@ -140,7 +140,7 @@ class ExternalAPIService:
                 )
 
                 if attempt >= self.max_retries:
-                    raise ExternalAPIError(f"API call timed out after {self.timeout}s")
+                    raise ExternalAPIError(f"API call timed out after {self.timeout}s") from None
 
             except httpx.RequestError as e:
                 logger.error(
@@ -153,7 +153,7 @@ class ExternalAPIService:
                 )
 
                 if attempt >= self.max_retries:
-                    raise ExternalAPIError(f"API request failed: {e}")
+                    raise ExternalAPIError(f"API request failed: {e}") from e
 
             except Exception as e:
                 logger.error(
@@ -163,13 +163,11 @@ class ExternalAPIService:
                     error=str(e),
                     exc_info=True,
                 )
-                raise ExternalAPIError(f"Unexpected error during API call: {e}")
+                raise ExternalAPIError(f"Unexpected error during API call: {e}") from e
 
         raise ExternalAPIError("API call failed after max retries")
 
-    def normalize_response(
-        self, data: Any, url: str, method: str
-    ) -> Dict[str, Any]:
+    def normalize_response(self, data: Any, url: str, method: str) -> dict[str, Any]:
         """
         Normalize external API response to a consistent format.
 
