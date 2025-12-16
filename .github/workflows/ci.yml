@@ -45,7 +45,7 @@ jobs:
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/integration_platform_test
           SECRET_KEY: test-secret-key-min-32-characters-long
-          ENCRYPTION_KEY: test-encryption-key-for-testing
+          ENCRYPTION_KEY: KlNKI1muZmSpdgBgT9GoPVLbw0nSsVQGGxf1IVjVEZg=
         run: |
           pytest app/tests/ -v --cov=app --cov-report=xml --cov-report=term-missing
 
