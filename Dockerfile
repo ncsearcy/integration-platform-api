@@ -32,7 +32,7 @@ COPY app/ /app/app/
 
 # Make sure scripts and packages in .local are usable
 ENV PATH=/root/.local/bin:$PATH \
-    PYTHONPATH=/root/.local/lib/python3.11/site-packages:$PYTHONPATH
+    PYTHONPATH=/root/.local/lib/python3.11/site-packages
 
 # Set default environment variables (can be overridden at runtime)
 ENV ENVIRONMENT=production \
