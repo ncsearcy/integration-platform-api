@@ -30,6 +30,11 @@ COPY --from=builder /root/.local /root/.local
 # Copy application code
 COPY app/ /app/app/
 
+# Create non-root user and give access to Python packages
+RUN useradd -m -u 1000 appuser && \
+    chown -R appuser:appuser /app && \
+    chmod -R 755 /root/.local
+
 # Make sure scripts and packages in .local are usable
 ENV PATH=/root/.local/bin:$PATH \
     PYTHONPATH=/root/.local/lib/python3.11/site-packages
@@ -39,8 +44,6 @@ ENV ENVIRONMENT=production \
     LOG_LEVEL=INFO \
     DATABASE_URL=postgresql://postgres:postgres@localhost:5432/integration_platform
 
-# Create non-root user
-RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 USER appuser
 
 # Expose port
